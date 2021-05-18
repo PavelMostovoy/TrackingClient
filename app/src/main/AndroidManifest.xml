@@ -17,7 +17,9 @@
         <activity
             android:name=".AddObjectActivity"
             android:label="ADD Object to track"
-            android:theme="@style/CustomNoActionBarTheme"></activity>
+            android:theme="@style/CustomNoActionBarTheme">
+
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
