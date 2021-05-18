@@ -61,60 +61,61 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-//                updateDateInView()
+                updateDateInView()
             }
 
-//        et_date.setOnClickListener(this)
-//        // TODO(Step 1: Adding an onclick listener to tv_add_image)
-//        // START
-//        tv_add_image.setOnClickListener(this)
-//        // END
+        et_date.setOnClickListener(this)
+        // TODO(Step 1: Adding an onclick listener to tv_add_image)
+        // START
+        tv_add_image.setOnClickListener(this)
+        // END
     }
 
-    override fun onClick(v: View?) {
-//        when (v!!.id) {
-//            R.id.et_date -> {
-//                DatePickerDialog(
-//                    this@AddHappyPlaceActivity,
-//                    dateSetListener, // This is the variable which have created globally and initialized in setupUI method.
-//                    // set DatePickerDialog to point to today's date when it loads up
-//                    cal.get(Calendar.YEAR), // Here the cal instance is created globally and used everywhere in the class where it is required.
-//                    cal.get(Calendar.MONTH),
-//                    cal.get(Calendar.DAY_OF_MONTH)
-//                ).show()
-//            }
-//
-//            // TODO(Step 2 : Adding an alert dialog for selection of image.)
-//            // START
-//            R.id.tv_add_image -> {
-//                val pictureDialog = AlertDialog.Builder(this)
-//                pictureDialog.setTitle("Select Action")
-//                val pictureDialogItems =
-//                    arrayOf("Select photo from gallery", "Capture photo from camera")
-//                pictureDialog.setItems(
-//                    pictureDialogItems
-//                ) { dialog, which ->
-//                    when (which) {
-//                        // Here we have create the methods for image selection from GALLERY
-//                        0 -> choosePhotoFromGallery()
-//                        1 -> Toast.makeText(this@AddHappyPlaceActivity,"Camera selection coming soon...", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//                pictureDialog.show()
-//            }
-//            // END
-//        }
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.et_date -> {
+                DatePickerDialog(
+                    this@AddObjectActivity,
+                    dateSetListener, // This is the variable which have created globally and initialized in setupUI method.
+                    // set DatePickerDialog to point to today's date when it loads up
+                    cal.get(Calendar.YEAR), // Here the cal instance is created globally and used everywhere in the class where it is required.
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)
+                ).show()
+            }
+
+            // TODO(Step 2 : Adding an alert dialog for selection of image.)
+            // START
+            R.id.tv_add_image -> {
+                val pictureDialog = AlertDialog.Builder(this)
+                pictureDialog.setTitle("Select Action")
+                val pictureDialogItems =
+                    arrayOf("Select photo from gallery", "Capture photo from camera","Get Location")
+                pictureDialog.setItems(
+                    pictureDialogItems
+                ) { _, which ->
+                    when (which) {
+                        // Here we have create the methods for image selection from GALLERY
+                        0 -> choosePhotoFromGallery()
+                        1 -> Toast.makeText(this@AddObjectActivity,"Camera selection coming soon...", Toast.LENGTH_SHORT).show()
+                        2 -> Toast.makeText(this@AddObjectActivity,"Location will be requested later",Toast.LENGTH_LONG).show()
+                    }
+                }
+                pictureDialog.show()
+            }
+            // END
+        }
     }
 
     /**
      * A function to update the selected date in the UI with selected format.
      * This function is created because every time we don't need to add format which we have added here to show it in the UI.
      */
-//    private fun updateDateInView() {
-//        val myFormat = "dd.MM.yyyy" // mention the format you need
-//        val sdf = SimpleDateFormat(myFormat, Locale.getDefault()) // A date format
-//        et_date.setText(sdf.format(cal.time).toString()) // A selected date using format which we have used is set to the UI.
-//    }
+    private fun updateDateInView() {
+        val myFormat = "dd.MM.yyyy" // mention the format you need
+        val sdf = SimpleDateFormat(myFormat, Locale.getDefault()) // A date format
+        et_date.setText(sdf.format(cal.time).toString()) // A selected date using format which we have used is set to the UI.
+    }
 
     // TODO (Step 3 : Creating a method for image selection from GALLERY / PHOTOS of phone storage.)
     // START
@@ -127,7 +128,8 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
         Dexter.withActivity(this)
             .withPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
