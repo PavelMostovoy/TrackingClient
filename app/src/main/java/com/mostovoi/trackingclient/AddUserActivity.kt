@@ -4,6 +4,7 @@ package com.mostovoi.trackingclient
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -57,11 +58,7 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     when (which) {
                         // Here we have create the methods for image selection from GALLERY
                         0 -> choosePhotoFromGallery()
-                        1 -> Toast.makeText(
-                            this@AddUserActivity,
-                            "Camera selection coming soon...",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        1 -> choosePhotoFromCamera()
                     }
                 }
                 pictureDialog.show()
@@ -90,18 +87,62 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
             }
+            else if (requestCode == CAMERA) {
+                if (data != null) {
+                    try {
+                        val selectedImageBitmap :Bitmap = data.extras!!.get("data") as Bitmap
+                        iv_place_image.setImageBitmap(selectedImageBitmap)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        Toast.makeText(
+                            this@AddUserActivity,
+                            "Can not load Image",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
+    }
+    private fun choosePhotoFromCamera() {
+        // Asking the permissions of Storage using DEXTER Library which we have added in gradle file
+        Dexter.withContext(this)
+            .withPermissions(
+//                Manifest.permission.READ_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+//                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    // Here after all the permission are granted launch the camera to select and image.
+                    if (report!!.areAllPermissionsGranted()) {
+                        val galleryIntent =
+                            Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        startActivityForResult(galleryIntent, CAMERA)
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    showRationalDialogForPermissions()
+                }
+            }).onSameThread()
+            .check()
+
     }
 
     /**
      * A method is used for image selection from GALLERY / PHOTOS of phone storage.
      */
-    private fun choosePhotoFromGallery() =
+    private fun choosePhotoFromGallery() {
         // Asking the permissions of Storage using DEXTER Library which we have added in gradle file
         Dexter.withContext(this)
             .withPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE,
 //                Manifest.permission.ACCESS_FINE_LOCATION
             )
             .withListener(object : MultiplePermissionsListener {
@@ -125,6 +166,7 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }).onSameThread()
             .check()
+    }
 
     private fun showRationalDialogForPermissions() {
         AlertDialog.Builder(this)
@@ -149,5 +191,6 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
         const val GALLERY = 1
+        const val CAMERA = 2
     }
 }

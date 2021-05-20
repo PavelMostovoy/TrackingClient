@@ -14,11 +14,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrackingClient">
-        <activity android:name=".AddTracingObjectActivity"></activity>
+        <activity
+            android:name=".AddTracingObjectActivity"
+            android:label="Add Tracking object"
+            android:theme="@style/CustomNoActionBarTheme">
+
+        </activity>
         <activity
             android:name=".AddUserActivity"
-            android:label="ADD Object to track"
-            android:theme="@style/CustomNoActionBarTheme"></activity>
+            android:label="Add User"
+            android:theme="@style/CustomNoActionBarTheme">
+
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
