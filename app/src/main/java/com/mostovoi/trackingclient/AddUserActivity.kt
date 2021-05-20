@@ -4,11 +4,9 @@ package com.mostovoi.trackingclient
 import android.Manifest
 import android.app.DatePickerDialog
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
@@ -19,11 +17,11 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.activity_add_object.*
+import kotlinx.android.synthetic.main.activity_add_user.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
+class AddUserActivity : AppCompatActivity(), View.OnClickListener {
 
     /**
      * An variable to get an instance calendar using the default time zone and locale.
@@ -44,7 +42,7 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
 
         // This is used to align the xml view to this class
-        setContentView(R.layout.activity_add_object)
+        setContentView(R.layout.activity_add_user)
 
         setSupportActionBar(toolbar_add_object) // Use the toolbar to set the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // This is to use the home back button.
@@ -71,11 +69,11 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
         // END
     }
 
-    override fun onClick(v: View) {
-        when (v.id) {
+    override fun onClick(v: View?) {
+        when (v!!.id) {
             R.id.et_date -> {
                 DatePickerDialog(
-                    this@AddObjectActivity,
+                    this@AddUserActivity,
                     dateSetListener, // This is the variable which have created globally and initialized in setupUI method.
                     // set DatePickerDialog to point to today's date when it loads up
                     cal.get(Calendar.YEAR), // Here the cal instance is created globally and used everywhere in the class where it is required.
@@ -97,8 +95,8 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
                     when (which) {
                         // Here we have create the methods for image selection from GALLERY
                         0 -> choosePhotoFromGallery()
-                        1 -> Toast.makeText(this@AddObjectActivity,"Camera selection coming soon...", Toast.LENGTH_SHORT).show()
-                        2 -> Toast.makeText(this@AddObjectActivity,"Location will be requested later",Toast.LENGTH_LONG).show()
+                        1 -> Toast.makeText(this@AddUserActivity,"Camera selection coming soon...", Toast.LENGTH_SHORT).show()
+                        2 -> Toast.makeText(this@AddUserActivity,"Location will be requested later",Toast.LENGTH_LONG).show()
                     }
                 }
                 pictureDialog.show()
@@ -137,7 +135,7 @@ class AddObjectActivity : AppCompatActivity(), View.OnClickListener {
                     // Here after all the permission are granted launch the gallery to select and image.
                     if (report!!.areAllPermissionsGranted()) {
 
-                        Toast.makeText(this@AddObjectActivity,"Storage READ/WRITE permission are granted. Now you can select an image from GALLERY or lets says phone storage.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AddUserActivity,"Storage READ/WRITE permission are granted. Now you can select an image from GALLERY or lets says phone storage.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
