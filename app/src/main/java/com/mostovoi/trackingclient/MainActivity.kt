@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-//Mock for registration number
-// 1 - activated 2 - not activated
-const val ACTIVATED = 0
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,5 +37,10 @@ class MainActivity : AppCompatActivity() {
 
         }
         // END
+    }
+    companion object{
+        //Mock for registration
+        // 1 - activated 2 - not activated
+        const val ACTIVATED = 0
     }
 }

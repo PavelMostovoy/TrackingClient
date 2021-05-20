@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
@@ -17,6 +18,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_add_user.*
+import java.io.IOException
 import java.util.*
 
 class AddUserActivity : AppCompatActivity(), View.OnClickListener {
@@ -55,7 +57,11 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     when (which) {
                         // Here we have create the methods for image selection from GALLERY
                         0 -> choosePhotoFromGallery()
-                        1 -> Toast.makeText(this@AddUserActivity,"Camera selection coming soon...", Toast.LENGTH_SHORT).show()
+                        1 -> Toast.makeText(
+                            this@AddUserActivity,
+                            "Camera selection coming soon...",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 pictureDialog.show()
@@ -64,11 +70,34 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == GALLERY) {
+                if (data != null) {
+                    try {
+                        val contentUri = data.data
+                        val selectedImageBitmap =
+                            MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
+                        iv_place_image.setImageBitmap(selectedImageBitmap)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        Toast.makeText(
+                            this@AddUserActivity,
+                            "Can not load Image",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * A method is used for image selection from GALLERY / PHOTOS of phone storage.
      */
     private fun choosePhotoFromGallery() =
-    // Asking the permissions of Storage using DEXTER Library which we have added in gradle file
+        // Asking the permissions of Storage using DEXTER Library which we have added in gradle file
         Dexter.withContext(this)
             .withPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -80,8 +109,11 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
 
                     // Here after all the permission are granted launch the gallery to select and image.
                     if (report!!.areAllPermissionsGranted()) {
+                        val galleryIntent =
+                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        startActivityForResult(galleryIntent, GALLERY)
 
-                        Toast.makeText(this@AddUserActivity,"Storage READ/WRITE permission are granted. Now you can select an image from GALLERY or lets says phone storage.", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this@AddUserActivity,"Storage READ/WRITE permission are granted. Now you can select an image from GALLERY or lets says phone storage.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -97,7 +129,8 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
     private fun showRationalDialogForPermissions() {
         AlertDialog.Builder(this)
             .setMessage("It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings")
-            .setPositiveButton("GO TO SETTINGS"
+            .setPositiveButton(
+                "GO TO SETTINGS"
             ) { _, _ ->
                 try {
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -112,5 +145,9 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                                            _ ->
                 dialog.dismiss()
             }.show()
+    }
+
+    companion object {
+        const val GALLERY = 1
     }
 }

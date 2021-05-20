@@ -11,6 +11,7 @@
     <string name="text_add_image">ADD IMAGE</string>
     <string name="btn_text_save">SAVE</string>
     <string name="edit_text_hint_password">Password</string>
+    <string name="btn_text_login">Log in/Sign in</string>
     <!--END-->
 
 
