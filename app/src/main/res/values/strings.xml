@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">TrackingClient</string>
-
-
-    <!--TODO (Step 5: Here we are adding the STRING values as a constants which are required to design the Add Happy Places Screen. And which is also a standard way to develop a application in android.)-->
-    <!--START-->
     <string name="edit_text_hint_name">Name</string>
     <string name="edit_text_hint_description">Description</string>
     <string name="edit_text_hint_display_name">Display Name</string>
@@ -13,8 +9,5 @@
     <string name="edit_text_hint_password">Password</string>
     <string name="btn_text_login">Log in/Sign in</string>
     <string name="edit_text_hint_login">Login</string>
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyACBVvx82bYfKhHKAfUcvi5aV_fMj7r60k</string>
-    <!--END-->
-
-
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIza__fMj7r60k</string>
 </resources>
