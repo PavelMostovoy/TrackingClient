@@ -56,14 +56,12 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     pictureDialogItems
                 ) { _, which ->
                     when (which) {
-                        // Here we have create the methods for image selection from GALLERY
                         0 -> choosePhotoFromGallery()
                         1 -> choosePhotoFromCamera()
                     }
                 }
                 pictureDialog.show()
             }
-            // END
         }
     }
 
