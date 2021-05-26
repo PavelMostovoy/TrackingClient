@@ -12,6 +12,8 @@
     <string name="btn_text_save">SAVE</string>
     <string name="edit_text_hint_password">Password</string>
     <string name="btn_text_login">Log in/Sign in</string>
+    <string name="edit_text_hint_login">Login</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyACBVvx82bYfKhHKAfUcvi5aV_fMj7r60k</string>
     <!--END-->
 
 
