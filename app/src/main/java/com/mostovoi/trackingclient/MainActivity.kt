@@ -3,14 +3,10 @@ package com.mostovoi.trackingclient
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.os.Looper
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
@@ -22,6 +18,11 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.*
+import java.io.IOException
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -31,6 +32,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var marker : Marker
     private var lat: Double = 0.0
     private var lon: Double = 0.0
+    private val client = OkHttpClient()
+    private var message: String = "empty"
+    val JSON: MediaType = "application/json; charset=utf-8".toMediaType()
+
+
     override fun onStart() {
         super.onStart()
     }
@@ -94,7 +100,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setUpLocationListener() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         // for getting the current location update after every 2 seconds with high accuracy
-        val locationRequest = LocationRequest().setInterval(10000).setFastestInterval(2000)
+        val locationRequest = LocationRequest().setInterval(10000).setFastestInterval(5000)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 
         fusedLocationProviderClient.requestLocationUpdates(
@@ -106,8 +112,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         lat = location.latitude
                         lon = location.longitude
                     }
-                    Toast.makeText(this@MainActivity, "$lat , $lon", Toast.LENGTH_SHORT)
-                        .show()
+//                    Toast.makeText(this@MainActivity, "$lat , $lon", Toast.LENGTH_SHORT)
+//                        .show()
+                    Toast.makeText(this@MainActivity,message,Toast.LENGTH_LONG).show()
+                    getRequest("https://google.com")
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
                     marker.position = LatLng(lat,lon)
                     // Few more things we can do here:
@@ -126,6 +134,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(LatLng(lat,lon))
                 .title("Marker in Sydney")
         )
+    }
+
+    fun getRequest(url: String) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response){
+               message = response.body?.string().toString()
+            }
+        })
+    }
+
+    fun postRequest(url: String, json: String){
+        val body = json.toRequestBody(JSON)
+        val request = Request.Builder()
+            .url(url)
+            .post(body)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) {
+                message = response.body?.string().toString()
+            }
+        })
     }
 
     companion object {
