@@ -1,6 +1,7 @@
 package com.mostovoi.trackingclient
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -10,11 +11,10 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -26,9 +26,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
-    private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
+    private lateinit var mMap: GoogleMap
+    private lateinit var marker : Marker
+    private var lat: Double = 0.0
+    private var lon: Double = 0.0
     override fun onStart() {
         super.onStart()
     }
@@ -37,17 +39,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         //This call the parent constructor
         super.onCreate(savedInstanceState)
 
+
         // This is used to align the xml view to this class
         setContentView(R.layout.activity_main)
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        // TODO (Step 1: Adding an click event to Fab button and calling the AddHappyPlaceActivity.)
-        // START
-        // Setting an click event for Fab Button and calling the AddHappyPlaceActivity.
         floatingActionButton.setOnClickListener {
             when (ACTIVATED) {
                 0 -> {
@@ -74,7 +72,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     if (report!!.areAllPermissionsGranted()) {
-//                        DO something when permissions granted
+                        setUpLocationListener()
                         Toast.makeText(this@MainActivity, "Permission granted", Toast.LENGTH_SHORT)
                             .show()
 
@@ -92,16 +90,42 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .check()
     }
 
+    @SuppressLint("MissingPermission")
+    private fun setUpLocationListener() {
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        // for getting the current location update after every 2 seconds with high accuracy
+        val locationRequest = LocationRequest().setInterval(10000).setFastestInterval(2000)
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    super.onLocationResult(locationResult)
+                    for (location in locationResult.locations) {
+                        lat = location.latitude
+                        lon = location.longitude
+                    }
+                    Toast.makeText(this@MainActivity, "$lat , $lon", Toast.LENGTH_SHORT)
+                        .show()
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
+                    marker.position = LatLng(lat,lon)
+                    // Few more things we can do here:
+                    // For example: Update the location of user on server
+                }
+            },
+            Looper.myLooper()
+        )
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(
+
+        marker = mMap.addMarker(
             MarkerOptions()
-                .position(sydney)
+                .position(LatLng(lat,lon))
                 .title("Marker in Sydney")
         )
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
     companion object {
