@@ -92,8 +92,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setUpLocationListener() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         // for getting the current location update after every 2 seconds with high accuracy
-        val locationRequest = LocationRequest().setInterval(10000).setFastestInterval(5000)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        val locationRequest = LocationRequest.create().apply(){
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
 
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest,
@@ -114,17 +117,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     // For example: Update the location of user on server
                 }
             },
-            Looper.myLooper()
+            Looper.myLooper()!!
         )
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         marker = mMap.addMarker(
             MarkerOptions()
                 .position(LatLng(lat,lon))
-                .title("Marker in Sydney")
+                .title("Marker")
         )
     }
 
