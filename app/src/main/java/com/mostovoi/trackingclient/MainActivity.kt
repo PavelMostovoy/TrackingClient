@@ -27,32 +27,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var mFusedLocationClient : FusedLocationProviderClient
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
 
     override fun onStart() {
         super.onStart()
-        Dexter.withContext(this)
-            .withPermissions(
-                Manifest.permission.ACCESS_FINE_LOCATION
-//                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
-            .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    if (report!!.areAllPermissionsGranted()) {
-//                        DO something when permissions granted
-                        Toast.makeText(this@MainActivity,"Permission granted",Toast.LENGTH_SHORT).show()
-
-                    }
-                }
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
-                ) {
-                    Toast.makeText(this@MainActivity,"Permission Not granted",Toast.LENGTH_SHORT).show()
-                }
-            }).onSameThread()
-            .check()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         //This call the parent constructor
         super.onCreate(savedInstanceState)
@@ -72,30 +52,59 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             when (ACTIVATED) {
                 0 -> {
                     val intent = Intent(this@MainActivity, AddUserActivity::class.java)
-                    startActivity(intent)}
+                    startActivity(intent)
+                }
                 1 -> {
                     val intent = Intent(this@MainActivity, AddTracingObjectActivity::class.java)
                     startActivity(intent)
                 }
-                else -> {Toast.makeText(this,"Not Allowed code",Toast.LENGTH_SHORT).show()}
+                else -> {
+                    Toast.makeText(this, "Not Allowed code", Toast.LENGTH_SHORT).show()
+                }
             }
 
 
         }
+        Dexter.withContext(this)
+            .withPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
 
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    if (report!!.areAllPermissionsGranted()) {
+//                        DO something when permissions granted
+                        Toast.makeText(this@MainActivity, "Permission granted", Toast.LENGTH_SHORT)
+                            .show()
+
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    Toast.makeText(this@MainActivity, "Permission Not granted", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }).onSameThread()
+            .check()
     }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(
             MarkerOptions()
                 .position(sydney)
-                .title("Marker in Sydney"))
+                .title("Marker in Sydney")
+        )
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
-    companion object{
+
+    companion object {
         //Mock for registration
         // 1 - activated 2 - not activated
         const val ACTIVATED = 0
