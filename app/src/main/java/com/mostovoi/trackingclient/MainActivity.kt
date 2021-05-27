@@ -19,10 +19,6 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
-import java.io.IOException
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -32,10 +28,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var marker : Marker
     private var lat: Double = 0.0
     private var lon: Double = 0.0
-    private val client = OkHttpClient()
-    private var message: String = "empty"
-    val JSON: MediaType = "application/json; charset=utf-8".toMediaType()
-
 
     override fun onStart() {
         super.onStart()
@@ -114,8 +106,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
 //                    Toast.makeText(this@MainActivity, "$lat , $lon", Toast.LENGTH_SHORT)
 //                        .show()
-                    Toast.makeText(this@MainActivity,message,Toast.LENGTH_LONG).show()
-                    getRequest("https://google.com")
+                    Toast.makeText(this@MainActivity,ServerCommunications.message ,Toast.LENGTH_LONG).show()
+                    ServerCommunications.getRequest ("https://google.com")
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
                     marker.position = LatLng(lat,lon)
                     // Few more things we can do here:
@@ -136,32 +128,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    fun getRequest(url: String) {
-        val request = Request.Builder()
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response){
-               message = response.body?.string().toString()
-            }
-        })
-    }
-
-    fun postRequest(url: String, json: String){
-        val body = json.toRequestBody(JSON)
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) {
-                message = response.body?.string().toString()
-            }
-        })
-    }
 
     companion object {
         //Mock for registration
