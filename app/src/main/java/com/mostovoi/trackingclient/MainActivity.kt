@@ -109,8 +109,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
 //                    Toast.makeText(this@MainActivity, "$lat , $lon", Toast.LENGTH_SHORT)
 //                        .show()
-                    Toast.makeText(this@MainActivity,ServerCommunications.message ,Toast.LENGTH_LONG).show()
-                    ServerCommunications.getRequest ("https://google.com")
+
+                    ServerCommunications.getRequest ("https://google.com", {
+                        Toast.makeText(this@MainActivity,it ,Toast.LENGTH_LONG).show()
+                    })
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
                     marker.position = LatLng(lat,lon)
                     // Few more things we can do here:
@@ -123,13 +125,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         marker = mMap.addMarker(
             MarkerOptions()
                 .position(LatLng(lat,lon))
                 .title("Marker")
-        )
+        )!!
     }
 
 
