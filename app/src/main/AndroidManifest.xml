@@ -21,7 +21,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TrackingClient">
+        android:theme="@style/Theme.TrackingClient"
+        android:usesCleartextTraffic="true">
+
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -50,6 +52,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
