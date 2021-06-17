@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         //Mock for registration
-        // 1 - activated 2 - not activated
+        // 1 - activated 0 - not activated
         const val ACTIVATED = 0
         const val IDN = "60ace15b8b211008f3744ffe"
 
