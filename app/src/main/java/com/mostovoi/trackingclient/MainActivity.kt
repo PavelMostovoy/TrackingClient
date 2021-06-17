@@ -127,8 +127,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .put("display_name","No name to display")
                     jsonObject_upd.put("timestamp", System.currentTimeMillis()/1000)
                         .put("position","$lat,$lon")
-//                    postRequest ("http://192.168.1.116:5000/api/v1.0/item",jsonObject.toString()){ message = it
-//                    }
+
                     putRequest("http://192.168.1.116:5000/api/v1.0/item/$IDN",jsonObject_upd.toString()){
                         message = it
                     }

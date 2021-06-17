@@ -19,6 +19,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_add_user.*
+import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
@@ -42,7 +43,18 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         tv_add_image.setOnClickListener(this)
-
+        btn_login.setOnClickListener {
+            var message = " "
+            var jsonObject = JSONObject()
+            jsonObject
+                .put("login","Some Login New")
+                .put("password","some_password")
+                .put("display_name","No name to display")
+            postRequest ("http://192.168.1.116:5000/api/v1.0/item",jsonObject.toString()){ message = it
+            Toast.makeText(this@AddUserActivity,
+                "new id $message ",Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onClick(v: View?) {
