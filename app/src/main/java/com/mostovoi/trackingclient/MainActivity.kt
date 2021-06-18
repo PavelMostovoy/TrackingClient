@@ -108,8 +108,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }).onSameThread()
                 .check()
-        }
-         else {
+        } else {
             Dexter.withContext(this)
                 .withPermissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -119,20 +118,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         if (report!!.areAllPermissionsGranted()) {
 
-                            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-                                    showRationalDialogForPermissions()
-                                }
+                            if (ContextCompat.checkSelfPermission(
+                                    this@MainActivity,
+                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                                )
+                                != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q
+                            ) {
+
+                                showRationalDialogForPermissions()
+
                             }
                             setUpLocationListener()
 
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Permission granted",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Permission granted",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
 
 
                         }
@@ -238,7 +241,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         //Mock for registration
         // 1 - activated 0 - not activated
         const val ACTIVATED = 0
-        const val IDN = "60ace15b8b211008f3744ffe"
+        const val IDN = "60cb6aa55d4283843ae117be"
 
     }
 
