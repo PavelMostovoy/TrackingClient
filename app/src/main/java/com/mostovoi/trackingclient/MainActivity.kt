@@ -2,11 +2,15 @@ package com.mostovoi.trackingclient
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
@@ -20,14 +24,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
-import okhttp3.internal.UTC
 import org.json.JSONObject
-import java.security.Timestamp
-import java.sql.Time
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -35,10 +32,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private lateinit var mMap: GoogleMap
-    private lateinit var marker : Marker
+    private lateinit var marker: Marker
     private var lat: Double = 0.0
     private var lon: Double = 0.0
-    var jsonObject= JSONObject()
+    var jsonObject = JSONObject()
     var jsonObject_upd = JSONObject()
     private var message = "Not Ready"
 
@@ -74,38 +71,113 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         }
-        Dexter.withContext(this)
-            .withPermissions(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            Dexter.withContext(this)
+                .withPermissions(
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
 
-            )
-            .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    if (report!!.areAllPermissionsGranted()) {
-                        setUpLocationListener()
-                        Toast.makeText(this@MainActivity, "Permission granted", Toast.LENGTH_SHORT)
-                            .show()
+                )
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                        if (report!!.areAllPermissionsGranted()) {
+                            setUpLocationListener()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Permission granted",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
 
+                        }
                     }
-                }
 
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
-                ) {
-                    Toast.makeText(this@MainActivity, "Permission Not granted", Toast.LENGTH_SHORT)
-                        .show()
+                    override fun onPermissionRationaleShouldBeShown(
+                        permissions: MutableList<PermissionRequest>?,
+                        token: PermissionToken?
+                    ) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Permission Not granted",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }).onSameThread()
+                .check()
+        }
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            showRationalDialogForPermissions()
+        } else {
+            Dexter.withContext(this)
+                .withPermissions(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                        if (report!!.areAllPermissionsGranted()) {
+                            setUpLocationListener()
+                            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+                                showRationalDialogForPermissions()
+                            } else {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Permission granted",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+
+                        }
+                    }
+
+                    override fun onPermissionRationaleShouldBeShown(
+                        permissions: MutableList<PermissionRequest>?,
+                        token: PermissionToken?
+                    ) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Permission Not granted",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }).onSameThread()
+                .check()
+        }
+    }
+
+    private fun showRationalDialogForPermissions() {
+        AlertDialog.Builder(this)
+            .setMessage(
+                "You are using Android 11 or newer, so for activate Location tracking" +
+                        "  on background you need to enable it manually on settings "
+            )
+            .setPositiveButton(
+                "GO TO SETTINGS"
+            ) { _, _ ->
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
                 }
-            }).onSameThread()
-            .check()
+            }
+            .setNegativeButton("Cancel") { dialog,
+                                           _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     @SuppressLint("MissingPermission")
     private fun setUpLocationListener() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         // for getting the current location update after every 2 seconds with high accuracy
-        val locationRequest = LocationRequest.create().apply(){
+        val locationRequest = LocationRequest.create().apply() {
             interval = 10000
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -122,18 +194,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         lon = location.longitude
                     }
                     jsonObject
-                        .put("login","Some Login New")
-                        .put("password","some_password")
-                        .put("display_name","No name to display")
-                    jsonObject_upd.put("timestamp", System.currentTimeMillis()/1000)
-                        .put("position","$lat,$lon")
+                        .put("login", "Some Login New")
+                        .put("password", "some_password")
+                        .put("display_name", "No name to display")
+                    jsonObject_upd.put("timestamp", System.currentTimeMillis() / 1000)
+                        .put("position", "$lat,$lon")
 
-                    putRequest("http://aqa.science/api/v1.0/item/$IDN",jsonObject_upd.toString()){
+                    putRequest("http://aqa.science/api/v1.0/item/$IDN", jsonObject_upd.toString()) {
                         message = it
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
-                    marker.position = LatLng(lat,lon)
-                    Toast.makeText(this@MainActivity,message,Toast.LENGTH_LONG).show()
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lon)))
+                    marker.position = LatLng(lat, lon)
+                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
                     // Few more things we can do here:
                     // For example: Update the location of user on server
                 }
@@ -146,7 +218,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         marker = mMap.addMarker(
             MarkerOptions()
-                .position(LatLng(lat,lon))
+                .position(LatLng(lat, lon))
                 .title("Marker")
         )!!
     }
