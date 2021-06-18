@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     jsonObject_upd.put("timestamp", System.currentTimeMillis()/1000)
                         .put("position","$lat,$lon")
 
-                    putRequest("http://192.168.1.116:5000/api/v1.0/item/$IDN",jsonObject_upd.toString()){
+                    putRequest("http://aqa.science/api/v1.0/item/$IDN",jsonObject_upd.toString()){
                         message = it
                     }
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,lon)))
