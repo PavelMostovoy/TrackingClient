@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
@@ -107,9 +109,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }).onSameThread()
                 .check()
         }
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            showRationalDialogForPermissions()
-        } else {
+         else {
             Dexter.withContext(this)
                 .withPermissions(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -118,17 +118,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         if (report!!.areAllPermissionsGranted()) {
+
+                            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+                                    showRationalDialogForPermissions()
+                                }
+                            }
                             setUpLocationListener()
-                            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-                                showRationalDialogForPermissions()
-                            } else {
+
                                 Toast.makeText(
                                     this@MainActivity,
                                     "Permission granted",
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()
-                            }
+
 
                         }
                     }
@@ -144,9 +149,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                             .show()
                     }
-                }).onSameThread()
+
+                }
+
+                ).onSameThread()
                 .check()
         }
+
+
     }
 
     private fun showRationalDialogForPermissions() {
