@@ -2,6 +2,7 @@ package com.mostovoi.trackingclient
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -125,7 +126,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                 != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q
                             ) {
 
-                                showRationalDialogForPermissions()
+                                showRationalDialogForPermissions(this@MainActivity, "You are using Android 11 or newer, so for activate Location tracking on background you need to enable it manually on settings ")
 
                             }
                             setUpLocationListener()
@@ -162,30 +163,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun showRationalDialogForPermissions() {
-        AlertDialog.Builder(this)
-            .setMessage(
-                "You are using Android 11 or newer, so for activate Location tracking" +
-                        "  on background you need to enable it manually on settings "
-            )
-            .setPositiveButton(
-                "GO TO SETTINGS"
-            ) { _, _ ->
-                try {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    val uri = Uri.fromParts("package", packageName, null)
-                    intent.data = uri
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                }
-            }
-            .setNegativeButton("Cancel") { dialog,
-                                           _ ->
-                dialog.dismiss()
-            }.show()
-    }
-
     @SuppressLint("MissingPermission")
     private fun setUpLocationListener() {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -218,7 +195,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lon)))
                     marker.position = LatLng(lat, lon)
-                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+//                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
                     // Few more things we can do here:
                     // For example: Update the location of user on server
                 }
@@ -242,6 +219,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // 1 - activated 0 - not activated
         const val ACTIVATED = 0
         const val IDN = "60cb6aa55d4283843ae117be"
+        fun showRationalDialogForPermissions(activity: Activity,message: String) {
+            AlertDialog.Builder(activity)
+                .setMessage(
+                    message
+                )
+                .setPositiveButton(
+                    "GO TO SETTINGS"
+                ) { _, _ ->
+                    try {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", activity.packageName, null)
+                        intent.data = uri
+                        activity.startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        e.printStackTrace()
+                    }
+                }
+                .setNegativeButton("Cancel") { dialog,
+                                               _ ->
+                    dialog.dismiss()
+                }.show()
+        }
 
     }
 

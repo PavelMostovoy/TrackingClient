@@ -18,6 +18,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.mostovoi.trackingclient.MainActivity.Companion.showRationalDialogForPermissions
 import kotlinx.android.synthetic.main.activity_add_user.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
@@ -135,7 +136,7 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     permissions: MutableList<PermissionRequest>?,
                     token: PermissionToken?
                 ) {
-                    showRationalDialogForPermissions()
+                    showRationalDialogForPermissions(this@AddUserActivity,"It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings")
                 }
             }).onSameThread()
             .check()
@@ -170,31 +171,10 @@ class AddUserActivity : AppCompatActivity(), View.OnClickListener {
                     permissions: MutableList<PermissionRequest>?,
                     token: PermissionToken?
                 ) {
-                    showRationalDialogForPermissions()
+                    showRationalDialogForPermissions(this@AddUserActivity,"It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings")
                 }
             }).onSameThread()
             .check()
-    }
-
-    private fun showRationalDialogForPermissions() {
-        AlertDialog.Builder(this)
-            .setMessage("It Looks like you have turned off permissions required for this feature. It can be enabled under Application Settings")
-            .setPositiveButton(
-                "GO TO SETTINGS"
-            ) { _, _ ->
-                try {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    val uri = Uri.fromParts("package", packageName, null)
-                    intent.data = uri
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                }
-            }
-            .setNegativeButton("Cancel") { dialog,
-                                           _ ->
-                dialog.dismiss()
-            }.show()
     }
 
     companion object {
